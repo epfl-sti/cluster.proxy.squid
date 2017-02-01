@@ -1,0 +1,18 @@
+{{/* Configuration file for the Squid that gateways egress HTTP traffic.
+     TODO: improve a lot. The plan is to run a web of parent caches
+     on non-gateway nodes (see the second, hairy picture on
+     http://wiki.squid-cache.org/Features/CacheHierarchy) so that they
+     can pilfer all the disk they want for the cache.
+*/}}
+
+
+acl localnet src 192.168.0.0/16 # RFC 1918 possible internal network
+# acl localnet src 10.0.0.0/8     # RFC 1918 possible internal network
+# acl localnet src 172.16.0.0/12  # RFC 1918 possible internal network
+# acl localnet src fc00::/7       # RFC 4193 local private network range
+# acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machines
+
+http_access allow localnet
+http_port {{ env "IPADDRESS" }}:{{ env "SQUID_PORT" }} intercept
+visible_hostname egress-proxy.{{ env "PUBLIC_WEB_DOMAIN" }}
+
